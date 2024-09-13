@@ -106,7 +106,7 @@ public class Collection {
 	public static List<Auto> obtenerTodosLosAutosQueNoSeanDelTipo(List<Auto> autos, String tipo) {
 		return autos
 				.stream()
-				.filter(auto -> auto.getTipos().remove(tipo))
+				.filter(auto -> auto.getTipos().stream().noneMatch(tipo::equals))
 				.toList();
 	}
 
@@ -118,7 +118,9 @@ public class Collection {
 	public static Set<String> obtenerLasMarcasQueTenganModelosConNumeros(List<Auto> autos) {
 		return autos
 				.stream()
-				.filter(auto -> auto.getModelo());
+				.filter(auto -> auto.getModelo().matches(".*\\d.*"))
+				.map(Auto::getMarca)
+				.collect(Collectors.toSet());
 	}
 
 	/*
