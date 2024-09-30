@@ -43,6 +43,14 @@ public class User {
         repositories.add(repository);
     }
 
+    public int getTotalRepositories() {
+        return repositories.size();
+    }
+
+    public double getTotalStars() {
+        return repositories.stream().mapToDouble(Repository :: getStars).sum();
+    }
+
     public String getName() {
         return name;
     }

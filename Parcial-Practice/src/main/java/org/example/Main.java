@@ -4,11 +4,17 @@ import java.nio.file.Paths;
 
 import org.example.service.FileParser;
 
+import jakarta.persistence.EntityManager;
+
 public class Main {
     public static void main(String[] args) {
-        FileParser parser = new FileParser();
-        parser.parseFile(Paths.get("src/main/REPOSITORIES.txt"));
-        parser.printStatistics();
-        parser.close();
+       private FileParser fileParser;
+       private EntityManager em; 
+       
+       @BeforeEach
+       public void setUp() {
+        em = mock(EntityManager.class);
+        fileParser = new FileParser(em);
+       }
     }
 }

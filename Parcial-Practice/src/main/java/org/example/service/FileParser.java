@@ -5,7 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -20,21 +22,21 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
 public class FileParser {
-    private EntityManagerFactory emf;
-    private int totalRepositories = 0;
-    private double totalStars = 0.0;
+    private Map<String, Tag> tags = new HashMap<>();
+    private Map<String, Language> languages = new HashMap<>();
+    private Map<String, User> users = new HashMap<>();
+
+    private Set<Repository> repositories = new HashSet<>();
+
+    private EntityManager em;
+    
 
     public FileParser() {
-        emf = Persistence.createEntityManagerFactory("gestorPersi");
+        this.em = em;
     }
 
     public void parseFile(Path filePath) {
-        EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-
-        Set<Tag> tags = new HashSet<>();
-        Set<Language> languages = new HashSet<>();
-        Set<User> users = new HashSet<>();
 
         try(Stream<String> lines = Files.lines(filePath)) {
             lines.skip(1).forEach(line -> { //Skip the first line
@@ -54,50 +56,49 @@ public class FileParser {
                 String url = parts[8];
 
                 //Create or get the user
-                User user = users.stream().filter(u -> u.getName().equals(userName)).findFirst().orElse(null);
-                if(user == null) {
-                    user = new User(userName);
-                    users.add(user);
-                    em.persist(user);
-                } else {
-                    user = em.merge(user); //Ensure the user is managed
-                }
+                User user = users.computeIfAbsent(userName, u -> {
+                    User newUser = new User(userName);
+                    em.persist(newUser);
+                    return newUser;
+                });
 
-                Language language = languages.stream().filter(l -> l.getName().equals(languageNames)).findFirst().orElse(null);
-                if (language == null) {
-                    language = new Language(languageNames);
-                    languages.add(language);
-                    em.persist(language);
-                } else {
-                    em.merge(language); //Ensure the language is managed
-                }
+                //Create new Repository and associate to user
+                Repository repository = new Repository();
+                repository.setRepositoryName(repoName);
+                repository.setDescription(description);
+                repository.setLastUpdate(lastUpdate);
+                repository.setId(repositoryId);
+                repository.setStars(stars);
+                repository.setUrl(url);
+                repository.setUser(user);
+                user.addRepository(repository);
+                
+
+                //Create the languages
+                Language language = languages.computeIfAbsent(languageNames, l -> {
+                    Language newLanguage = new Language(languageNames);
+                    em.persist(newLanguage);
+                    return newLanguage;
+                });
+                repository.getLanguages().add(language);
 
                 //Create or get the language
                 String[] tagNames = tagsString.split(",");
                 //Iterate over the tag names and create or get the tags
                 for (String tagName : tagNames) {
-                    Tag tag = tags.stream().filter(t -> t.getName().equals(tagName)).findFirst().orElse(null);
-                    if(tag == null) {
-                        tag = new Tag(tagName);
-                        tags.add(tag);
-                        em.persist(tag);
-                    } else {
-                        tag = em.merge(tag); //Ensure the tag is managed
-                    }
+                    Tag tag = tags.computeIfAbsent(tagName, t -> {
+                        Tag newTag = new Tag(tagName);
+                        em.persist(newTag);
+                        return newTag;
+                    });
+                    repository.getTags().add(tag);
                 }
 
-                //Create the Repository
-                Repository repository = new Repository(repositoryId, repoName, description, lastUpdate, stars, url);
-                repository.setLanguages(languages);
-                repository.setTags(tags);
-                //Add the repository to the user
-                user.addRepository(repository);
+                repositories.add(repository);
                 em.persist(repository);
-
-                //Update total repositories and stars
-                totalRepositories++;
-                totalStars += stars;
             });
+
+            reportTotals();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -106,12 +107,11 @@ public class FileParser {
         em.close();
     }
 
-    public void close() {
-        emf.close();
-    }
-
-    public void printStatistics() {
-        System.out.println("Total repositories: " + totalRepositories);
-        System.out.println("Average stars: " + totalStars);
+    //Method to print the total of repos and stars.
+    public void reportTotals() {
+        int totalRepositories = repositories.size();
+        double totalStars = repositories.stream().mapToDouble(Repository::getStars).sum();
+        System.out.println("Total de repositorios importados: " + totalRepositories);
+        System.out.println("Total de estrellas acumuladas: " + totalStars);
     }
 }
