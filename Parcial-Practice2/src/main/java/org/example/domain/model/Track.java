@@ -12,7 +12,7 @@ public class Track {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name =  "track_id")
-    private int id;
+    private Integer id;
     private String name;
     private long milliseconds;
 
@@ -46,7 +46,8 @@ public class Track {
 
     public Track() {}
 
-    public Track(String name, long milliseconds, Album album, Genre genre, MediaType mediaType, Set<Artist> artists, Set<Composer> composers) {
+    public Track(Integer id, String name, long milliseconds, Album album, Genre genre, MediaType mediaType, Set<Artist> artists, Set<Composer> composers) {
+        this.id = id;
         this.name = name;
         this.milliseconds = milliseconds;
         this.album = album;
