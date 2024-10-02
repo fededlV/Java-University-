@@ -1,0 +1,39 @@
+C++,0,0
+Shell,0,0
+Jupyter Notebook,0,0
+JavaScript,0,0
+HTML,0,0
+Vue,0,0
+Go,0,0
+Emacs Lisp,0,0
+Java,0,0
+Clojure,0,0
+Rascal,0,0
+C#,0,0
+OCaml,0,0
+Ruby,0,0
+Vim script,0,0
+Rust,0,0
+PHP,0,0
+Python,0,0
+Lua,0,0
+Assembly,0,0
+Perl,0,0
+Matlab,0,0
+Haskell,0,0
+Objective-C++,0,0
+PureBasic,0,0
+Swift,0,0
+Julia,0,0
+Kotlin,0,0
+TypeScript,0,0
+TeX,0,0
+Crystal,0,0
+Objective-C,0,0
+Elixir,0,0
+Scala,0,0
+CSS,0,0
+C,0,0
+PowerShell,0,0
+Batchfile,0,0
+CoffeeScript,0,0
