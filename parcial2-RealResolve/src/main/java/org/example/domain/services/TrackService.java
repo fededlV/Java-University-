@@ -2,6 +2,7 @@ package org.example.domain.services;
 
 import org.example.domain.model.*;
 
+import javax.swing.plaf.basic.BasicSliderUI;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,8 +25,8 @@ public class TrackService {
         this.trackRepository = trackRepository;
     }
 
-    public void saveAll(TrackRepository trackRepository) {
-        this.trackRepository = trackRepository;
+    public void saveAll(Set<Track> tracks) {
+        trackRepository.saveAll(tracks);
     }
 
     public List<Track> findAll() {
@@ -38,6 +39,10 @@ public class TrackService {
 
     public List<Track> findByGenre(String genre) {
         return this.trackRepository.findByGenre(genre);
+    }
+
+    public List<Track> findByArtist(String artist) {
+        return this.trackRepository.findByArtist(artist);
     }
 
     public Set<Track> loadTracks() {
@@ -66,7 +71,8 @@ public class TrackService {
                            Map<String, Artist> artistMap,
                            Map<String, Composer> composerMap,
                            Map<String, Genre> genreMap,
-                           Map<String, MediaType> mediaTypeMap,Map<String, Album> albumMap) {
+                           Map<String, MediaType> mediaTypeMap,
+                           Map<String, Album> albumMap) {
         String[] values = line.split("\\|");
 
         Integer trackId = Integer.parseInt(values[0]);
@@ -77,6 +83,7 @@ public class TrackService {
         Integer milliseconds = Integer.parseInt(values[5]);
         String genreName = values[6];
         String mediaTypeName = values[7];
+
         Genre genre = genreMap.getOrDefault(genreName, new Genre(genreName));
         MediaType mediaType = mediaTypeMap.getOrDefault(mediaTypeName, new MediaType(mediaTypeName));
         Album album = albumMap.getOrDefault(albumName, new Album(albumName));

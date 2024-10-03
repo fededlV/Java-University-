@@ -5,17 +5,19 @@ import org.example.domain.model.Track;
 import org.example.domain.model.TrackRepository;
 
 import java.util.List;
+import java.util.Set;
 
 public class JPARepository implements TrackRepository {
 
     @Override
-    public void saveAll(List<Track> tracks) {
+    public void saveAll(Set<Track> tracks) {
         try (EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("persistence")){
             EntityManager entityManager = entityManagerFactory.createEntityManager();
             EntityTransaction transaction = entityManager.getTransaction();
             transaction.begin();
             tracks.forEach(entityManager::persist);
             transaction.commit();
+            entityManager.close();
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -55,6 +57,16 @@ public class JPARepository implements TrackRepository {
 
             return entityManager.createQuery("SELECT t FROM Track t WHERE t.genre.name = :genre", Track.class)
                     .setParameter("genre", genre)
+                    .getResultList();
+        }
+    }
+
+    public List<Track> findByArtist(String artist) {
+        try(EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("persitence")){
+            EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+            return entityManager.createQuery("SELECT t FROM Track t JOIN t.artists a WHERE a.name = :artist", Track.class)
+                    .setParameter("artist", artist)
                     .getResultList();
         }
     }

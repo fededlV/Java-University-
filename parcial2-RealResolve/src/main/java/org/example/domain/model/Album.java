@@ -48,7 +48,7 @@ public class Album implements Comparable<Album> {
                 .sum();
     }
 
-    public String getTotalMilliseconds() {
+    public String getTotalTime() {
         setTotalMilliseconds();
         int total = totalMilliseconds;
         long hours = total / 3600000;
@@ -72,7 +72,7 @@ public class Album implements Comparable<Album> {
 
     public String getAlbumInfo() {
         String stringTemplate = "- %s tiene un total de %d tracks culminando en una duracion de %s";
-        return String.format(stringTemplate, name, tracks.size(), getTotalMilliseconds());
+        return String.format(stringTemplate, name, tracks.size(), getTotalTime());
     }
 
 
@@ -81,15 +81,15 @@ public class Album implements Comparable<Album> {
         return this.name.compareTo(o.name);
     }
 
-    @Override
+    /*@Override
     public String toString() {
         return "Album{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", totalTime=" + getTotalMilliseconds() +
+                ", totalTime=" + totalMilliseconds +
                 ", tracks=" + tracks +
                 '}';
-    }
+    }*/
 
     @Override
     public boolean equals(Object o) {
